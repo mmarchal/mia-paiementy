@@ -18,6 +18,8 @@ class _Paiement extends State<Paiement> {
 
   List<Produit> produitsList = new List();
 
+  double prix = 0.0;
+
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> scanBarcodeNormal() async {
     String barcodeScanRes;
@@ -83,13 +85,41 @@ class _Paiement extends State<Paiement> {
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text(p.nomProduit),
-                        Text(p.prixProduit)
+                        Text(p.nomProduit, textScaleFactor: 1.2,),
+                        Text(p.prixProduit, textScaleFactor: 1.2,),
+                        InkWell(
+                          child: Container(
+                            margin: EdgeInsets.only(top: 20),
+                            width: 100,
+                            height: 40,
+                            alignment: Alignment.center,
+                            //color: Colors.red,
+                            decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(25.0),
+                                    bottomRight: Radius.circular(25.0))),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.delete, color: Colors.white,),
+                                Text("Supprimer", style: TextStyle(color: Colors.white),)
+                              ],
+                            ),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              produitsList.removeAt(index);
+                            });
+                          },
+                        )
                       ],
                     ),
                   );
                 })),
-            Row(
+            Text("Total : " + prix.toString() + " € "),
+            Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 RaisedButton(
@@ -109,6 +139,7 @@ class _Paiement extends State<Paiement> {
                 RaisedButton(
                   onPressed: () {
                     setState(() {
+                      prix = 0.0;
                       produitsList.clear();
                     });
                   },
@@ -135,6 +166,10 @@ class _Paiement extends State<Paiement> {
         produit.nomProduit = element + " " + liste[i+1];
       } else if (element.contains("€")) {
         produit.prixProduit = element;
+        element = element.replaceAll("€", "").replaceAll(",", ".");
+        setState(() {
+          prix += double.parse(element);
+        });
       }
 
     }
