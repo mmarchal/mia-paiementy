@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mia_paiement/menu.dart';
+import 'package:mia_paiement/validation.dart';
 
 class Paiement extends StatefulWidget {
   Paiement({Key key}) : super(key: key);
@@ -14,7 +15,6 @@ class Paiement extends StatefulWidget {
 class _Paiement extends State<Paiement> {
 
   String _scanBarcode = 'Unknown';
-  Produit produit = new Produit();
 
   List<Produit> produitsList = new List();
 
@@ -111,6 +111,9 @@ class _Paiement extends State<Paiement> {
                           onTap: () {
                             setState(() {
                               produitsList.removeAt(index);
+                              setState(() {
+                                prix = prix - double.parse(p.prixProduit.replaceAll("€", "").replaceAll(",", "."));
+                              });
                             });
                           },
                         )
@@ -144,6 +147,14 @@ class _Paiement extends State<Paiement> {
                     });
                   },
                   child: Text("Vider le panier"),
+                ),
+                RaisedButton(
+                  onPressed: () {
+                    Navigator.push(context, new MaterialPageRoute(builder: (BuildContext bC) {
+                      return new Validation(prix: prix);
+                    }));
+                  },
+                  child: Text("Valider le panier"),
                 )
               ],
             )
@@ -154,6 +165,8 @@ class _Paiement extends State<Paiement> {
   }
 
   void analyseQrCode(String scanBarcode) {
+
+    Produit produit = new Produit();
 
     String resultat = scanBarcode.replaceAll("Ajouter aux favoris", ";").replaceAll("Note", " Note").replaceAll("Epuisé", ";").replaceAll(" ", ";");
     List<String> liste = resultat.split(";");
