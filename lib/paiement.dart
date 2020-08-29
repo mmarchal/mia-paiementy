@@ -4,6 +4,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mia_paiement/menu.dart';
 import 'package:mia_paiement/validation.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class Paiement extends StatefulWidget {
   Paiement({Key key}) : super(key: key);
@@ -15,10 +16,30 @@ class Paiement extends StatefulWidget {
 class _Paiement extends State<Paiement> {
 
   String _scanBarcode = 'Unknown';
+  int _groupValue = -1;
 
   List<Produit> produitsList = new List();
 
   double prix = 0.0;
+
+  TextEditingController textEditingController = new TextEditingController();
+
+  var alertStyle = AlertStyle(
+    animationType: AnimationType.fromTop,
+    isCloseButton: false,
+    isOverlayTapDismiss: false,
+    descStyle: TextStyle(fontWeight: FontWeight.bold),
+    animationDuration: Duration(milliseconds: 400),
+    alertBorder: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(0.0),
+      side: BorderSide(
+        color: Colors.grey,
+      ),
+    ),
+    titleStyle: TextStyle(
+      color: Colors.red,
+    ),
+  );
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> scanBarcodeNormal() async {
@@ -41,6 +62,14 @@ class _Paiement extends State<Paiement> {
       _scanBarcode = barcodeScanRes;
     });
     this.analyseQrCode(_scanBarcode);
+  }
+
+  Widget _myRadioButton({String title, int value, Function onChanged}) {
+    return Radio(
+      value: value,
+      groupValue: _groupValue,
+      onChanged: onChanged,
+    );
   }
 
   @override
@@ -150,9 +179,69 @@ class _Paiement extends State<Paiement> {
                 ),
                 RaisedButton(
                   onPressed: () {
-                    Navigator.push(context, new MaterialPageRoute(builder: (BuildContext bC) {
-                      return new Validation(prix: prix);
-                    }));
+                    showDialog<void>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          int selectedRadio = 0;
+                          return AlertDialog(
+                            content: StatefulBuilder(
+                              builder: (BuildContext context, StateSetter setState) {
+                                return new Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text("Choix du paiement du client : ", textAlign: TextAlign.center,),
+                                    SizedBox(height: 15,),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        _myRadioButton(
+                                          title: "Checkbox 0",
+                                          value: 0,
+                                          onChanged: (newValue) => setState(() => _groupValue = newValue),
+                                        ),
+                                        new Text(
+                                          'Liquide',
+                                          style: new TextStyle(fontSize: 16.0),
+                                        ),
+                                        _myRadioButton(
+                                          title: "Checkbox 1",
+                                          value: 1,
+                                          onChanged: (newValue) => setState(() => _groupValue = newValue),
+                                        ),
+                                        new Text(
+                                          'Chèque',
+                                          style: new TextStyle(
+                                            fontSize: 16.0,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(height: 15,),
+                                    Text("Nom du client : ", textAlign: TextAlign.center,),
+                                    SizedBox(height: 15,),
+                                    Flexible(
+                                        child: TextField(
+                                          controller: textEditingController,
+                                          decoration: InputDecoration(
+                                              hintText: 'Exemple : Dupont'
+                                          ),
+                                        )
+                                    ),
+                                    SizedBox(height: 15,),
+                                    RaisedButton(
+                                      child: Text("Valider le paiement"),
+                                      onPressed: () {
+                                        
+                                      },
+                                    )
+                                  ],
+                                );
+                              },
+                            ),
+                          );
+                        }
+                    );
                   },
                   child: Text("Valider le panier"),
                 )

@@ -32,6 +32,7 @@ dependencies:
   flutter_barcode_scanner: ^1.0.1
   sqflite: ^1.2.0
   path_provider: ^1.5.1
+  rflutter_alert: ^1.0.2
 
 dev_dependencies:
   flutter_test:

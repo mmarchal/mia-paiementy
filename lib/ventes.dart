@@ -10,9 +10,24 @@ class Ventes extends StatefulWidget {
 
 class _Ventes extends State<Ventes> {
 
+  final dbHelper = MySQL.instance;
+
+  void getAll() async {
+    final allRows = await dbHelper.queryAllRows();
+    print('query all rows:');
+    allRows.forEach((row) => print(row));
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    this.getAll();
+  }
+
   @override
   Widget build(BuildContext context) {
-    throw UnimplementedError();
+    return Scaffold();
   }
 
 }
