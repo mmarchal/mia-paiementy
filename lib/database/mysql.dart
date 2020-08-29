@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 
 class MySQL {
 
-  static final _databaseName = "Database-Ventes-Mia-App.db";
+  static final _databaseName = "Database-Ventes.db";
   static final _databaseVersion = 1;
 
   static final table = 'vente';
@@ -15,6 +15,7 @@ class MySQL {
   static final columnNom = 'nom';
   static final columnPrix = 'prix';
   static final columnType = 'type';
+  static final columnAcheteur = 'acheteur';
 
   // make this a singleton class
   MySQL._privateConstructor();
@@ -42,10 +43,11 @@ class MySQL {
   Future _onCreate(Database db, int version) async {
     await db.execute('''
           CREATE TABLE $table (
-            $columnId INTEGER PRIMARY KEY,
-            $columnNom TEXT NOT NULL,
-            $columnPrix TEXT NOT NULL,
-            $columnType TEXT NOT NULL
+            id INTEGER PRIMARY KEY,
+            nom TEXT NOT NULL,
+            prix TEXT NOT NULL,
+            type TEXT NOT NULL,
+            acheteur TEXT NOT NULL
           )
           ''');
   }

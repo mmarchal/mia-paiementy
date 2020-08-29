@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mia_paiement/database/modele/vente.dart';
+import 'package:mia_paiement/database/mysql.dart';
 import 'package:mia_paiement/menu.dart';
 import 'package:mia_paiement/validation.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -23,6 +25,7 @@ class _Paiement extends State<Paiement> {
   double prix = 0.0;
 
   TextEditingController textEditingController = new TextEditingController();
+  final dbHelper = MySQL.instance;
 
   var alertStyle = AlertStyle(
     animationType: AnimationType.fromTop,
@@ -41,7 +44,6 @@ class _Paiement extends State<Paiement> {
     ),
   );
 
-  // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> scanBarcodeNormal() async {
     String barcodeScanRes;
     // Platform messages may fail, so we use a try/catch PlatformException.
@@ -74,7 +76,6 @@ class _Paiement extends State<Paiement> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     this.scanBarcodeNormal();
 
@@ -82,7 +83,6 @@ class _Paiement extends State<Paiement> {
 
   @override
   Widget build(BuildContext context) {
-    print(produitsList.length);
     return Scaffold(
       body: Container(
         margin: EdgeInsets.only(top: 50),
@@ -232,7 +232,18 @@ class _Paiement extends State<Paiement> {
                                     RaisedButton(
                                       child: Text("Valider le paiement"),
                                       onPressed: () {
-                                        
+                                        String produitsAchetes = "";
+                                        Vente v = new Vente();
+                                        for(int i = 0; i<produitsList.length; i++) {
+                                          produitsAchetes = produitsAchetes + produitsList[i].nomProduit + " / ";
+                                        }
+                                        v.id=null;
+                                        v.nom_produit = produitsAchetes;
+                                        v.prix_produit = prix.toString();
+                                        v.type_paiement = (_groupValue==1) ? "Chèque" : "Liquide";
+                                        v.acheteur = textEditingController.text;
+                                        print(v.toMap());
+                                        dbHelper.insert(v.toMap()).then((value) => print(value));
                                       },
                                     )
                                   ],
