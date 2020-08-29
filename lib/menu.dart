@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mia_paiement/database/mysql.dart';
 import 'package:mia_paiement/paiement.dart';
 import 'package:mia_paiement/stock.dart';
 import 'package:mia_paiement/ventes.dart';
@@ -14,6 +15,14 @@ class Menu extends StatefulWidget {
 }
 
 class _Menu extends State<Menu> {
+
+  final dbHelper = MySQL.instance;
+
+  void getAll() async {
+    final allRows = await dbHelper.queryAllRows();
+    print('query all rows:');
+    allRows.forEach((row) => print(row));
+  }
 
   @override
   Widget build(BuildContext context) {
