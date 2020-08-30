@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mia_paiement/database/mysql.dart';
 
 class Ventes extends StatefulWidget {
   Ventes({Key key}) : super(key: key);
@@ -10,19 +9,12 @@ class Ventes extends StatefulWidget {
 
 class _Ventes extends State<Ventes> {
 
-  final dbHelper = MySQL.instance;
-
-  void getAll() async {
-    final allRows = await dbHelper.queryAllRows();
-    print('query all rows:');
-    allRows.forEach((row) => print(row));
-  }
+  //Lire fichier csv et faire un tableau avec possibilité de supprimer ou modifier
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    this.getAll();
   }
 
   @override

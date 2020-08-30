@@ -1,11 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mia_paiement/database/modele/vente.dart';
-import 'package:mia_paiement/database/mysql.dart';
+import 'package:mia_paiement/modele/vente.dart';
 import 'package:mia_paiement/menu.dart';
-import 'package:mia_paiement/validation.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class Paiement extends StatefulWidget {
@@ -25,7 +26,6 @@ class _Paiement extends State<Paiement> {
   double prix = 0.0;
 
   TextEditingController textEditingController = new TextEditingController();
-  final dbHelper = MySQL.instance;
 
   var alertStyle = AlertStyle(
     animationType: AnimationType.fromTop,
@@ -72,6 +72,32 @@ class _Paiement extends State<Paiement> {
       groupValue: _groupValue,
       onChanged: onChanged,
     );
+  }
+
+  Future<File> get _localFile async {
+    Directory tempDir = await getApplicationDocumentsDirectory();
+    return File('${tempDir.path}/commande.csv');
+  }
+
+  Future<bool> writeFile(String text) async {
+    final file = await _localFile;
+    file.exists().then((value) {
+      if(value) {
+        try {
+          file.writeAsString('$text', mode: FileMode.append);
+        } catch (e) {
+          return false;
+        }
+      } else {
+        file.create().then((value) {
+          try {
+            file.writeAsString('$text', mode: FileMode.append);
+          } catch (e) {
+            return false;
+          }
+        });
+      }
+    });
   }
 
   @override
@@ -237,13 +263,35 @@ class _Paiement extends State<Paiement> {
                                         for(int i = 0; i<produitsList.length; i++) {
                                           produitsAchetes = produitsAchetes + produitsList[i].nomProduit + " / ";
                                         }
-                                        v.id=null;
                                         v.nom_produit = produitsAchetes;
                                         v.prix_produit = prix.toString();
                                         v.type_paiement = (_groupValue==1) ? "Chèque" : "Liquide";
                                         v.acheteur = textEditingController.text;
-                                        print(v.toMap());
-                                        dbHelper.insert(v.toMap()).then((value) => print(value));
+                                        try {
+                                          this.writeFile(v.toString());
+                                          Fluttertoast.showToast(
+                                              msg: "Commande enregistré",
+                                              toastLength: Toast.LENGTH_SHORT,
+                                              gravity: ToastGravity.BOTTOM,
+                                              timeInSecForIosWeb: 5,
+                                              backgroundColor: Colors.green,
+                                              textColor: Colors.white,
+                                              fontSize: 16.0
+                                          );
+                                        } catch (e) {
+                                          Fluttertoast.showToast(
+                                              msg: "Erreur dans l'enregistrement",
+                                              toastLength: Toast.LENGTH_SHORT,
+                                              gravity: ToastGravity.BOTTOM,
+                                              timeInSecForIosWeb: 5,
+                                              backgroundColor: Colors.red,
+                                              textColor: Colors.white,
+                                              fontSize: 16.0
+                                          );
+                                        }
+                                        Navigator.push(context, new MaterialPageRoute(builder: (BuildContext bC) {
+                                          return new Menu();
+                                        }));
                                       },
                                     )
                                   ],

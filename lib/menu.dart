@@ -1,9 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mia_paiement/database/mysql.dart';
 import 'package:mia_paiement/paiement.dart';
 import 'package:mia_paiement/stock.dart';
 import 'package:mia_paiement/ventes.dart';
+import 'dart:io' as io;
 
 class Menu extends StatefulWidget {
   Menu({Key key, this.title}) : super(key: key);
@@ -16,12 +17,28 @@ class Menu extends StatefulWidget {
 
 class _Menu extends State<Menu> {
 
-  final dbHelper = MySQL.instance;
 
-  void getAll() async {
-    final allRows = await dbHelper.queryAllRows();
-    print('query all rows:');
-    allRows.forEach((row) => print(row));
+
+  /*void creationFichierHistorique() {
+    File fichierHisto = new File("fichier/histo.xslx");
+
+    fichierHisto.exists().then((value) {
+
+      if(value) {
+        fichier = fichierHisto;
+      } else {
+        fichier = fichierHisto.create().then((value) => p);
+      }
+
+    }).catchError((error) {
+      print(error);
+    });
+  }*/
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
   }
 
   @override
@@ -90,7 +107,7 @@ class _Menu extends State<Menu> {
                   }));
                 },
               ),
-              SizedBox(height: 20,),
+              /*SizedBox(height: 20,),
               InkWell(
                 child: Container(
                   width: MediaQuery.of(context).size.width,
@@ -123,7 +140,7 @@ class _Menu extends State<Menu> {
                     return new Stock();
                   }));
                 },
-              ),
+              ),*/
               SizedBox(height: 20,),
               InkWell(
                 child: Container(
@@ -164,4 +181,5 @@ class _Menu extends State<Menu> {
       ),
     );
   }
+
 }
