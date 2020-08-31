@@ -81,17 +81,19 @@ class _Paiement extends State<Paiement> {
 
   Future<bool> writeFile(String text) async {
     final file = await _localFile;
+    // ignore: missing_return
     file.exists().then((value) {
       if(value) {
         try {
-          file.writeAsString('$text', mode: FileMode.append);
+          file.writeAsString('$text\n', mode: FileMode.append);
         } catch (e) {
           return false;
         }
       } else {
+        // ignore: missing_return
         file.create().then((value) {
           try {
-            file.writeAsString('$text', mode: FileMode.append);
+            file.writeAsString('$text\n', mode: FileMode.append);
           } catch (e) {
             return false;
           }
