@@ -31,7 +31,8 @@ dependencies:
   google_fonts: ^1.1.0
   flutter_barcode_scanner: ^1.0.1
   path_provider: ^1.5.1
-  rflutter_alert: ^1.0.2
+  rflutter_alert: ^1.0.3
+  intl: ^0.16.1
   fluttertoast: ^7.0.4
 
 dev_dependencies:

@@ -4,7 +4,5 @@ import 'package:mia_paiement/myapp.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_){
-    runApp(MyApp());
-  });
+  runApp(MyApp());
 }

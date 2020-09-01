@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:mia_paiement/modele/vente.dart';
 import 'package:mia_paiement/menu.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,6 +21,7 @@ class _Paiement extends State<Paiement> {
 
   String _scanBarcode = 'Unknown';
   int _groupValue = -1;
+  final f = new DateFormat('dd-MM-yyyy hh:mm');
 
   List<Produit> produitsList = new List();
 
@@ -111,6 +113,7 @@ class _Paiement extends State<Paiement> {
 
   @override
   Widget build(BuildContext context) {
+    String dateJour = f.format(DateTime.now());
     return Scaffold(
       body: Container(
         margin: EdgeInsets.only(top: 50),
@@ -265,6 +268,7 @@ class _Paiement extends State<Paiement> {
                                         for(int i = 0; i<produitsList.length; i++) {
                                           produitsAchetes = produitsAchetes + produitsList[i].nomProduit + " / ";
                                         }
+                                        v.date_vente = dateJour;
                                         v.nom_produit = produitsAchetes;
                                         v.prix_produit = prix.toString();
                                         v.type_paiement = (_groupValue==1) ? "Chèque" : "Liquide";
