@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mia_paiement/menu.dart';
+import 'package:mia_paiement/modele/DatabaseHelper.dart';
 import 'package:mia_paiement/modele/vente.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -24,61 +27,21 @@ class _Ventes extends State<Ventes> {
 
   List<Vente> ventesProduits = new List();
 
-  bool info;
+  final dbHelper = DatabaseHelper.instance;
 
   final f = new DateFormat('dd-MM-yyyy hh:mm');
-
-  Future<File> get _localFile async {
-    Directory tempDir = await getApplicationDocumentsDirectory();
-    return File('${tempDir.path}/commande.csv');
-  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    info = decoupageFichier(fichierDonnees);
-  }
-
-  bool decoupageFichier(File fichierDonnees) {
-    bool test;
-    _localFile.then((value) {
-      fichierDonnees = value;
-      try {
-        donnees = fichierDonnees.readAsStringSync();
+    dbHelper.queryAllRows().then((value) {
+      value.forEach((element) {
         setState(() {
-          test = true;
+          ventesProduits.add(element);
         });
-      } catch (e) {
-        print(e);
-        setState(() {
-          test = false;
-        });
-      }
-      return test;
+      });
     });
-  }
-
-  void traitement() {
-
-    List<String> listeProduits = donnees.split('\n');
-    for( int i=0; i<listeProduits.length; i++ ) {
-
-      List<String> decoupe = listeProduits[i].split(';');
-
-      if(decoupe.length!=1) {
-        Vente vente = new Vente();
-        vente.date_vente = decoupe[0];
-        vente.nom_produit = decoupe[1];
-        vente.prix_produit = decoupe[2];
-        vente.type_paiement = decoupe[3];
-        vente.acheteur = decoupe[4];
-
-        ventesProduits.add(vente);
-      }
-
-    }
-    // Let's create a DataTable and show the employee list in it.
   }
 
   Widget texteFonce(String text, double xFactor) {
@@ -95,16 +58,25 @@ class _Ventes extends State<Ventes> {
 
   @override
   Widget build(BuildContext context) {
-    if( info != null || info==true || donnees !=null) {
-      traitement();
+    if( ventesProduits !=null) {
       return Scaffold(
         appBar: AppBar(
           centerTitle: true,
           title: Text("Historique des ventes"),
+          leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.push(context, new MaterialPageRoute(builder: (BuildContext bC) {
+                  return new Menu();
+                }));
+              }
+          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.file_download),
-              onPressed: () { Scaffold.of(context).openDrawer(); },
+              onPressed: () {
+                recupDatasEtEcritureFichier();
+              },
             ),
           ],
         ),
@@ -139,7 +111,10 @@ class _Ventes extends State<Ventes> {
                     DataCell(
                       Icon(Icons.delete, color: Colors.red,),
                       onTap: () {
-                        print(ve.toString());
+                        dbHelper.delete(ve.id);
+                        Navigator.push(context, new MaterialPageRoute(builder: (BuildContext bC) {
+                          return new Ventes();
+                        }));
                       },
                     ),
                 DataCell(
@@ -222,6 +197,25 @@ class _Ventes extends State<Ventes> {
         ),
       );
     }
+  }
+
+  Future<void> recupDatasEtEcritureFichier() async {
+    String datas = "";
+    String filename = "donneesApp.csv";
+    dbHelper.queryAllRows().then((value) {
+      value.forEach((element) {
+        setState(() {
+          datas+=("${element.toString()}\n");
+        });
+      });
+    }).whenComplete(() {
+      String dir = "/sdcard/download/";
+      print(datas);
+      File file = new File('$dir/$filename');
+      file.writeAsString(datas);
+      return file;
+    });
+
   }
 
 }

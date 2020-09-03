@@ -34,6 +34,13 @@ dependencies:
   rflutter_alert: ^1.0.3
   intl: ^0.16.1
   fluttertoast: ^7.0.4
+  sqflite: ^1.2.0
+  flutter_launcher_icons: ^0.7.5
+
+flutter_icons:
+  image_path: "assets/app.jpg"
+  android: true
+  ios: true
 
 dev_dependencies:
   flutter_test:
@@ -56,6 +63,7 @@ flutter:
     - assets/stock.jpg
     - assets/ventes.png
     - assets/logo.png
+    - assets/app.jpg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

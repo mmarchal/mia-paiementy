@@ -5,6 +5,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:mia_paiement/modele/DatabaseHelper.dart';
 import 'package:mia_paiement/modele/vente.dart';
 import 'package:mia_paiement/menu.dart';
 import 'package:path_provider/path_provider.dart';
@@ -28,6 +29,8 @@ class _Paiement extends State<Paiement> {
   double prix = 0.0;
 
   TextEditingController textEditingController = new TextEditingController();
+
+  final dbHelper = DatabaseHelper.instance;
 
   var alertStyle = AlertStyle(
     animationType: AnimationType.fromTop,
@@ -57,9 +60,6 @@ class _Paiement extends State<Paiement> {
       barcodeScanRes = 'Failed to get platform version.';
     }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
 
     setState(() {
@@ -104,11 +104,21 @@ class _Paiement extends State<Paiement> {
     });
   }
 
+  void _insert(Map<String, dynamic> m) async {
+    final id = await dbHelper.insert(m);
+    print('inserted row id: $id');
+  }
+
+  void _query() async {
+    final allRows = await dbHelper.queryAllRows();
+    print('query all rows:');
+    allRows.forEach((row) => print(row));
+  }
+
   @override
   void initState() {
     super.initState();
     this.scanBarcodeNormal();
-
   }
 
   @override
@@ -274,7 +284,8 @@ class _Paiement extends State<Paiement> {
                                         v.type_paiement = (_groupValue==1) ? "Chèque" : "Liquide";
                                         v.acheteur = textEditingController.text;
                                         try {
-                                          this.writeFile(v.toString());
+                                          //this.writeFile(v.toString());
+                                          this._insert(v.toMap());
                                           Fluttertoast.showToast(
                                               msg: "Commande enregistré",
                                               toastLength: Toast.LENGTH_SHORT,
