@@ -219,14 +219,14 @@ class _Ventes extends State<Ventes> {
   }
 
   void _sendEmail(File x) async {
-    String username = 'maximemarchal24@gmail.com';
-    String password = 'emlhxnqqwkcswlhp';
+    String username = 'contactapp.miabijoux@gmail.com';
+    String password = 'bpelablzwklzcthq';
 
     final smtpServer = gmail(username, password);
 
     final message = Message()
       ..from = Address(username, 'Your name')
-      ..recipients.add('maximemarchal24@gmail.com')
+      ..recipients.add(username)
       ..attachments.add(FileAttachment(x))
       ..subject = 'Test Dart Mailer library :: 😀 :: ${DateTime.now()}'
       ..text = 'This is the plain text.\nThis is line 2 of the text part.'
@@ -234,7 +234,7 @@ class _Ventes extends State<Ventes> {
 
     try {
       final sendReport = await send(message, smtpServer);
-      print('Message sent: ' + sendReport.toString());
+      print('Message envoyé: ' + sendReport.toString());
       Fluttertoast.showToast(
           msg: "Message envoyé !",
           toastLength: Toast.LENGTH_SHORT,
