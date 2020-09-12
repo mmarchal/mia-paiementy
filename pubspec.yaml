@@ -36,6 +36,8 @@ dependencies:
   fluttertoast: ^7.0.4
   sqflite: ^1.2.0
   flutter_launcher_icons: ^0.7.5
+  flutter_mailer: ^0.5.1
+  mailer: ^3.2.1
 
 flutter_icons:
   image_path: "assets/app.jpg"

@@ -1,16 +1,14 @@
-import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
-
+import 'dart:io' show File, Platform;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:mailer/smtp_server.dart';
 import 'package:mia_paiement/menu.dart';
 import 'package:mia_paiement/modele/DatabaseHelper.dart';
 import 'package:mia_paiement/modele/vente.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:mailer/mailer.dart';
 
 class Ventes extends StatefulWidget {
   Ventes({Key key}) : super(key: key);
@@ -202,20 +200,63 @@ class _Ventes extends State<Ventes> {
   Future<void> recupDatasEtEcritureFichier() async {
     String datas = "";
     String filename = "donneesApp.csv";
+
     dbHelper.queryAllRows().then((value) {
       value.forEach((element) {
         setState(() {
           datas+=("${element.toString()}\n");
         });
       });
-    }).whenComplete(() {
-      String dir = "/sdcard/download/";
-      print(datas);
+    }).whenComplete(() async {
+      String dir = await getApplicationDocumentsDirectory().then((value) => value.path);
+      print(dir);
       File file = new File('$dir/$filename');
       file.writeAsString(datas);
+      this._sendEmail(file);
       return file;
     });
 
+  }
+
+  void _sendEmail(File x) async {
+    String username = 'maximemarchal24@gmail.com';
+    String password = 'emlhxnqqwkcswlhp';
+
+    final smtpServer = gmail(username, password);
+
+    final message = Message()
+      ..from = Address(username, 'Your name')
+      ..recipients.add('maximemarchal24@gmail.com')
+      ..attachments.add(FileAttachment(x))
+      ..subject = 'Test Dart Mailer library :: 😀 :: ${DateTime.now()}'
+      ..text = 'This is the plain text.\nThis is line 2 of the text part.'
+      ..html = "<h1>Test</h1>\n<p>Hey! Here's some HTML content</p>";
+
+    try {
+      final sendReport = await send(message, smtpServer);
+      print('Message sent: ' + sendReport.toString());
+      Fluttertoast.showToast(
+          msg: "Message envoyé !",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 5,
+          backgroundColor: Colors.blue,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+    } on MailerException catch (e) {
+      for (var p in e.problems) {
+        Fluttertoast.showToast(
+            msg: "Message non envoyé : ${p.code}: ${p.msg}",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 5,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      }
+    }
   }
 
 }
